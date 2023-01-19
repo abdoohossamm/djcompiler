@@ -13,7 +13,7 @@ class CommandUtility:
         "compile": compile.CompileProject,
         "buildfile": buildfile.BuildFile,
         "buildpy": buildpy.BuildPY,
-        "--help" or "help": compile.CompileProject
+        "help": compile.CompileProject
     }
 
     def __init__(self, argv=None):
