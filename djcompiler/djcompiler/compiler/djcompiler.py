@@ -58,8 +58,7 @@ class DjangoCompiler:
         if ignored_dirs:
             self.ignored_dirs = ignored_dirs
         if ignored_files:
-            self.ignored_files= ignored_files
-
+            self.ignored_files = ignored_files
 
     def check_ignored_dirs(self, path_name: str):
         """
