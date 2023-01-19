@@ -42,6 +42,10 @@ class DjangoCompiler:
         """
         if ignored_dirs is None:
             ignored_dirs = []
+        if ignored_files is None:
+            ignored_dirs = []
+        if other_files_needed is None:
+            ignored_dirs = []
         self.ignored_dirs = ignored_dirs
         self.ignored_files = ignored_files
         self.build_directory = build_directory
