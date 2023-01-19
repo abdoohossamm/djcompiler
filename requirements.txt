@@ -1,4 +1,0 @@
-setuptools>=44
-cython>=0.29.33
-wheel>=0.38.4
-Django>=3.0.14
