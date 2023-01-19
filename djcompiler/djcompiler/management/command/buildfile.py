@@ -8,7 +8,7 @@ project_author=author
 project_version=1.0.0
 # Compiler data
 build_directory=build
-other_files_needed=manage.py .env
+other_files_needed=manage.py .env __init__.py
 ignored_files=manage.py compiler.py
 ignored_dirs=venv/ cython/ .git/ .idea/ build/ __pycache__/"""
 
