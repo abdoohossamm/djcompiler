@@ -35,4 +35,5 @@ jobs:
     - name: Run Tests on Compiled Version
       run: |
         cd build/
+        ls
         python manage.py test
