@@ -37,4 +37,4 @@ class CommandUtility:
 def execute_from_command_line(argv=None):
     """Run a CommandUtility."""
     utility = CommandUtility(argv)
-    return utility.execute()
+    utility.execute()
