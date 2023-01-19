@@ -28,6 +28,8 @@ class CompileProject(BaseCommand):
             if build_file == "1":
                 config_file = buildfile.BuildFile()
                 config_file.execute()
+                self.intial_configs()
+                print("ReInitial the configs again")
             if build_file == "0":
                 exit()
 
