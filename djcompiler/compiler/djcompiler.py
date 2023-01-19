@@ -29,7 +29,9 @@ class DjangoCompiler:
                  other_files_needed: List[str] = None,
                  ignored_files: List[str] = None,
                  project_name: str = "",
-                 c_dir: str = ""
+                 project_author: str = "author",
+                 project_version: str = "1.0.0",
+                 c_dir: str = "",
                  ):
         """
         A class that compiles django project to C language.
@@ -45,13 +47,19 @@ class DjangoCompiler:
         self.build_directory = build_directory
         self.other_files_needed = other_files_needed
         self.project_name = project_name
+        self.project_author = project_author
+        self.project_version = project_version
         if len(sys.argv) < 2:
             sys.argv = ['setup.py', 'build_ext', '--build-lib', build_directory]
         if '--build-lib' in sys.argv:
             self.build_directory = sys.argv[sys.argv.index('--build-lib') + 1]
 
-    def set_ignored(self, ignored: List[str]):
-        self.ignored_dirs = ignored
+    def set_ignored(self, ignored_dirs: List[str] = None, ignored_files: List[str] = None):
+        if ignored_dirs:
+            self.ignored_dirs = ignored_dirs
+        if ignored_files:
+            self.ignored_files= ignored_files
+
 
     def check_ignored_dirs(self, path_name: str):
         """
@@ -93,6 +101,7 @@ class DjangoCompiler:
         return modules
 
     def copy_migrations_to_build(self):
+        print("#################### Copy migrations modules ####################")
         for dir_path in self.migration_dirs:
             migration_path: str = f"./{self.build_directory}/{dir_path}"
             if self.check_ignored_dirs(path_name=dir_path):
@@ -105,12 +114,13 @@ class DjangoCompiler:
 
     def inital_python_modules(self):
         for path, subdirs, files in os.walk(f"./{self.build_directory}"):
-            if path.endswith(f"/{self.build_directory}"):
+            if path.endswith(f"/{self.build_directory}") or f"./{self.build_directory}/temp." in path:
                 continue
             f = open(f"{path}/__init__.py", "w")
             f.close()
 
     def copy_needed_files(self, files: list = None):
+        print("#################### Copy needed files ####################")
         if files is None:
             files = self.other_files_needed
         for file in files:
@@ -139,14 +149,14 @@ class DjangoCompiler:
         print("#################### Building python modules ####################")
         setup(
             name=self.project_name,
+            version=self.project_version,
+            author=self.project_author,
             cmdclass={'build_ext': Cython.Distutils.build_ext},
             ext_modules=cythonize(ext_modules, build_dir=cython_dir,
                                   compiler_directives=compiler_directives,
                                   ),
 
         )
-        print("#################### Copy migrations modules ####################")
         self.copy_migrations_to_build()
         self.inital_python_modules()
-        print("#################### Copy needed files ####################")
         self.copy_needed_files()
