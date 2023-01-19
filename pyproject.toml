@@ -1,0 +1,11 @@
+[build-system]
+requires = [
+    'setuptools>=42',
+    'cython>=0.29.33',
+    'wheel',
+    'Django>=3.0.14'
+]
+build-backend = 'setuptools.build_meta'
+
+[tool.black]
+force-exclude = 'tests/test_runner_apps/tagged/tests_syntax_error.py'
