@@ -21,7 +21,10 @@ class CompileProject(BaseCommand):
                     self.config[line_split[0]] = value
         except FileNotFoundError as e:
             print("The config file couldn't be found type 1 to create it or 0 to finish")
-            build_file = input(">>> ")
+            try:
+                build_file = input(">>> ")
+            except EOFError:
+                build_file = 0
             if build_file == "1":
                 config_file = buildfile.BuildFile()
                 config_file.execute()
