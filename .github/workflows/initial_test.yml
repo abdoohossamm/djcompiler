@@ -27,12 +27,12 @@ jobs:
         pip install .
     - name: buildfile command for testproject
       run: |
-        cd /testproject
+        cd testproject/
         djcompiler buildfile
     - name: Compile testproject compile command
       run: |
         djcompiler compile
     - name: Run Tests on Compiled Version
       run: |
-        cd /build
+        cd build/
         python manage.py test
