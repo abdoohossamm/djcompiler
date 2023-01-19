@@ -36,5 +36,4 @@ jobs:
     - name: Run Tests on Compiled Version
       working-directory: ./testproject/build
       run: |
-        cd build/
         python manage.py test
