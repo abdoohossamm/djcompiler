@@ -26,10 +26,15 @@ jobs:
         python -m pip install --upgrade pip
         pip install .
     - name: buildfile command for testproject
+      working-directory: ./testproject
       run: |
-        cd testproject/
         djcompiler buildfile
+    - name: Compile testproject compile command
+      working-directory: ./testproject
+      run: |
         djcompiler compile
+    - name: Run Tests on Compiled Version
+      working-directory: ./testproject/build
+      run: |
         cd build/
-        ls
         python manage.py test
