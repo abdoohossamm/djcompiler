@@ -6,6 +6,7 @@ import sys
 
 class CompileProject(BaseCommand):
     config: dict = {}
+    description: str = "\n\tThis command compile the django project \n\tNOTE: Run it in project working directory."
 
     def intial_configs(self):
         try:

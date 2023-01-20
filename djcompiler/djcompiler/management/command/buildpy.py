@@ -2,6 +2,8 @@ from djcompiler.management.command import BaseCommand
 
 
 class BuildPY(BaseCommand):
+    description: str = "\n\tThis build a djcompiler script that when you run compile the project " \
+                       "\n\tNOTE: Run it in project working directory."
     compiler = """
 from djcompiler import DjangoCompiler
 

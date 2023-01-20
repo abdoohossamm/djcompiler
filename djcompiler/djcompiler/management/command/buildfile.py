@@ -2,7 +2,10 @@ from djcompiler.management.command import BaseCommand
 
 
 class BuildFile(BaseCommand):
-    compiler_config = """# Project details
+    description: str = "\n\tThis command generate a djcompiler configs file " \
+                       "that has configurations needed to run djcompiler compile" \
+                       "\n\tNOTE: Run it in project working directory."
+    compiler_config: str = """# Project details
 project_name=DjCompiler
 project_author=author
 project_version=1.0.0
