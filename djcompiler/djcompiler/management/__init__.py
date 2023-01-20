@@ -1,20 +1,33 @@
 import os
 import sys
-from djcompiler.management.command import BaseCommand
-from djcompiler.management.command import buildfile, buildpy, compile
+from djcompiler.management.command import BaseCommand, buildfile, buildpy, compile, help
 from typing import Dict
+
+
+class Help(BaseCommand):
+    description: str = "\n\tThis command shows all commands available and how the usage of each one of them"
+
+    def commands_description(self):
+        for command_name, command_class in commands.items():
+            print(f"djcompiler {command_name}: {command_class.description}")
+
+    def execute(self):
+        self.commands_description()
+
+
+commands: Dict[str] = {
+    "buildfile": buildfile.BuildFile,
+    "buildpy": buildpy.BuildPY,
+    "compile": compile.CompileProject,
+    "help": Help,
+    "--help": Help,
+}
 
 
 class CommandUtility:
     """
     Encapsulate the logic of the djcompiler utilities.
     """
-    commands: Dict[str, BaseCommand] = {
-        "compile": compile.CompileProject,
-        "buildfile": buildfile.BuildFile,
-        "buildpy": buildpy.BuildPY,
-        "help": compile.CompileProject
-    }
 
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]
@@ -23,9 +36,12 @@ class CommandUtility:
             self.prog_name = "python -m djcompiler"
 
     def get_command(self):
-        command = self.commands.get(self.argv[1], "help")()
+        try:
+            command = commands.get(self.argv[1], "help")()
+        except IndexError:
+            command = commands.get("compile")()
         if len(self.argv) > 1:
-            command = self.commands.get(self.argv[1], "help")(self.argv[2:])
+            command = commands.get(self.argv[1], "help")(self.argv[2:])
         if not command:
             raise f"command {command} is not available use help command to show commands"
         return command
