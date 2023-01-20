@@ -1,6 +1,6 @@
 import os
 import sys
-from djcompiler.management.command import BaseCommand, buildfile, buildpy, compile, help
+from djcompiler.management.command import BaseCommand, buildfile, buildpy, compile
 from typing import Dict
 
 
