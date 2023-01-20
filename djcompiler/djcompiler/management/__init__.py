@@ -1,7 +1,6 @@
 import os
 import sys
 from djcompiler.management.command import BaseCommand, buildfile, buildpy, compile
-from typing import Dict
 
 
 class Help(BaseCommand):
@@ -15,7 +14,7 @@ class Help(BaseCommand):
         self.commands_description()
 
 
-commands: Dict[str] = {
+commands: dict = {
     "buildfile": buildfile.BuildFile,
     "buildpy": buildpy.BuildPY,
     "compile": compile.CompileProject,
