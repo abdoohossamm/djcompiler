@@ -39,6 +39,7 @@ class DjangoCompiler:
         :param ignored_dirs: list[str] -> a list of directories to ignore while building for example the env variables.
         :param build_directory: path to the build output directory.
         :param other_files_needed: files to copy to the build directory like the env file or manage.py script.
+        :param other_dirs_needed: dirs to copy to the build directory like the static dir and media dir.
         :param c_dir: a path to the C files output.
         """
         if ignored_dirs is None:
