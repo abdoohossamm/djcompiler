@@ -133,7 +133,8 @@ class DjangoCompiler:
             except FileNotFoundError as e:
                 print(f"Couldn't copy directory {dir_path} to build directory")
 
-    def inital_python_modules(self):
+    def initial_python_modules(self):
+        print("#################### Initial Python Modules ####################")
         for path, subdirs, files in os.walk(f"./{self.build_directory}"):
             if path.endswith(f"/{self.build_directory}") or f"./{self.build_directory}/temp." in path:
                 continue
@@ -179,6 +180,6 @@ class DjangoCompiler:
 
         )
         self.copy_migrations_to_build()
-        self.inital_python_modules()
+        self.initial_python_modules()
         self.copy_needed_files()
         self.copy_needed_dirs()
