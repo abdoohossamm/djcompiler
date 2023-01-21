@@ -181,3 +181,4 @@ class DjangoCompiler:
         self.copy_migrations_to_build()
         self.inital_python_modules()
         self.copy_needed_files()
+        self.copy_needed_dirs()
