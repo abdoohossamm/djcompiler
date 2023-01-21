@@ -27,6 +27,7 @@ class DjangoCompiler:
                  ignored_dirs: List[str] = None,
                  build_directory: str = "build",
                  other_files_needed: List[str] = None,
+                 other_dirs_needed: List[str] = None,
                  ignored_files: List[str] = None,
                  project_name: str = "",
                  project_author: str = "author",
@@ -46,10 +47,13 @@ class DjangoCompiler:
             ignored_files = []
         if other_files_needed is None:
             other_files_needed = []
+        if other_dirs_needed is None:
+            other_dirs_needed = []
         self.ignored_dirs = ignored_dirs
         self.ignored_files = ignored_files
         self.build_directory = build_directory
         self.other_files_needed = other_files_needed
+        self.other_dirs_needed = other_dirs_needed
         self.project_name = project_name
         self.project_author = project_author
         self.project_version = project_version
@@ -114,6 +118,20 @@ class DjangoCompiler:
             except FileNotFoundError as e:
                 print(f"building migration file {migration_path}")
             shutil.copytree(f"{dir_path}", migration_path)
+
+    def copy_needed_dirs(self, dirs: list = None):
+        if dirs is None:
+            dirs = self.other_dirs_needed
+        print("#################### Copy Needed Dirs ####################")
+        for dir_path in dirs:
+            build_dir_path: str = f"./{self.build_directory}/{dir_path}"
+            if self.check_ignored_dirs(path_name=dir_path):
+                continue
+            try:
+                shutil.copytree(f"{dir_path}", build_dir_path, dirs_exist_ok=True)
+                print(f"Copy dir {dir_path} to build")
+            except FileNotFoundError as e:
+                print(f"Couldn't copy directory {dir_path} to build directory")
 
     def inital_python_modules(self):
         for path, subdirs, files in os.walk(f"./{self.build_directory}"):
