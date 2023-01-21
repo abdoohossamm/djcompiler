@@ -15,6 +15,7 @@ if __name__ == "__main__":
         project_version="1.0.0",
         build_directory="build",
         other_files_needed=["manage.py", ".env", "__init__.py"],
+        other_dirs_needed=["static"]
         ignored_files=["manage.py", "setup.py", "compiler.py"]
     )
     ignored = compiler.initial_ignored_dirs + ["django_compiler/"]
