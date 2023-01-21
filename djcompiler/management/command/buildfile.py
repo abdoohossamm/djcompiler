@@ -12,6 +12,7 @@ project_version=1.0.0
 # Compiler data
 build_directory=build
 other_files_needed=manage.py .env __init__.py
+other_dirs_needed=static media
 ignored_files=manage.py compiler.py
 ignored_dirs=venv/ cython/ .git/ .idea/ build/ __pycache__/"""
 
