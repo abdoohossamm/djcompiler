@@ -26,3 +26,5 @@ Usage
 * run ``djcompiler buildfile`` to generate a config file.
 * run ``djcompiler buildpy`` to generate a python script that compiles the project when run.
 
+Future Features
+===============
