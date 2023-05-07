@@ -27,6 +27,7 @@ class DjangoCompiler:
                  ignored_dirs: List[str] = None,
                  build_directory: str = "build",
                  other_files_needed: List[str] = None,
+                 other_dirs_needed: List[str] = None,
                  ignored_files: List[str] = None,
                  project_name: str = "",
                  project_author: str = "author",
@@ -38,6 +39,7 @@ class DjangoCompiler:
         :param ignored_dirs: list[str] -> a list of directories to ignore while building for example the env variables.
         :param build_directory: path to the build output directory.
         :param other_files_needed: files to copy to the build directory like the env file or manage.py script.
+        :param other_dirs_needed: dirs to copy to the build directory like the static dir and media dir.
         :param c_dir: a path to the C files output.
         """
         if ignored_dirs is None:
@@ -46,10 +48,13 @@ class DjangoCompiler:
             ignored_files = []
         if other_files_needed is None:
             other_files_needed = []
+        if other_dirs_needed is None:
+            other_dirs_needed = []
         self.ignored_dirs = ignored_dirs
         self.ignored_files = ignored_files
         self.build_directory = build_directory
         self.other_files_needed = other_files_needed
+        self.other_dirs_needed = other_dirs_needed
         self.project_name = project_name
         self.project_author = project_author
         self.project_version = project_version
@@ -115,9 +120,33 @@ class DjangoCompiler:
                 print(f"building migration file {migration_path}")
             shutil.copytree(f"{dir_path}", migration_path)
 
-    def inital_python_modules(self):
+    def copy_needed_dirs(self, dirs: list = None):
+        if dirs is None:
+            dirs = self.other_dirs_needed
+        print("#################### Copy Needed Dirs ####################")
+        for dir_path in dirs:
+            build_dir_path: str = f"./{self.build_directory}/{dir_path}"
+            if self.check_ignored_dirs(path_name=dir_path):
+                continue
+            try:
+                shutil.copytree(f"{dir_path}", build_dir_path, dirs_exist_ok=True)
+                print(f"Copy dir {dir_path} to build")
+            except FileNotFoundError as e:
+                print(f"Couldn't copy directory {dir_path} to build directory")
+
+    def python_modules_rules(self, path_name):
+        ignore_build_dir = path_name.endswith(f"/{self.build_directory}")
+        ignore_temp_dirs = f"./{self.build_directory}/temp." in f"{path_name}/"
+        for dir in self.other_dirs_needed:
+            ignore_other_needed_dirs = f"./{self.build_directory}/{dir}" in f"{path_name}/"
+            if ignore_build_dir or ignore_temp_dirs or ignore_other_needed_dirs:
+                return True
+        return False
+
+    def initial_python_modules(self):
+        print("#################### Initial Python Modules ####################")
         for path, subdirs, files in os.walk(f"./{self.build_directory}"):
-            if path.endswith(f"/{self.build_directory}") or f"./{self.build_directory}/temp." in path:
+            if self.python_modules_rules(path):
                 continue
             f = open(f"{path}/__init__.py", "w")
             f.close()
@@ -128,18 +157,17 @@ class DjangoCompiler:
             files = self.other_files_needed
         for file in files:
             try:
-                shutil.copy(file, f"./{self.build_directory}")
+                shutil.copy(file, f"./{self.build_directory}/{file}")
             except FileNotFoundError:
                 print(f"file {file} not found")
             except FileExistsError:
                 print(f"file {file} already copied")
 
-    def compile_project(self, ext_modules: Set[Extension] = None,
+    def compile_modules(self, ext_modules: Set[Extension] = None,
                         cython_dir: str = "cython",
-                        compiler_directives: dict = None
-                        ) -> None:
+                        compiler_directives: dict = None) -> None:
         """
-        A function that compiles the django project
+        A method that compile the python modules
         :param ext_modules: set[Extension]: not required -> files that should be compiled
         :param cython_dir: str -> the C files output dir.
         :param compiler_directives: dict -> extra compiler option [like the lanugae]
@@ -158,8 +186,27 @@ class DjangoCompiler:
             ext_modules=cythonize(ext_modules, build_dir=cython_dir,
                                   compiler_directives=compiler_directives,
                                   ),
-
         )
+
+    def compile_project(self) -> None:
+        """
+        A method that compiles the django project
+        the method runs:
+            compile_modules()
+
+            copy_migrations_to_build()
+
+            initial_python_modules()
+
+            copy_needed_files()
+
+            copy_needed_dirs()
+
+        methods
+        :return: None
+        """
+        self.compile_modules()
         self.copy_migrations_to_build()
-        self.inital_python_modules()
+        self.initial_python_modules()
         self.copy_needed_files()
+        self.copy_needed_dirs()
