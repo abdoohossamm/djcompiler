@@ -157,18 +157,17 @@ class DjangoCompiler:
             files = self.other_files_needed
         for file in files:
             try:
-                shutil.copy(file, f"./{self.build_directory}")
+                shutil.copy(file, f"./{self.build_directory}/{file}")
             except FileNotFoundError:
                 print(f"file {file} not found")
             except FileExistsError:
                 print(f"file {file} already copied")
 
-    def compile_project(self, ext_modules: Set[Extension] = None,
+    def compile_modules(self, ext_modules: Set[Extension] = None,
                         cython_dir: str = "cython",
-                        compiler_directives: dict = None
-                        ) -> None:
+                        compiler_directives: dict = None) -> None:
         """
-        A function that compiles the django project
+        A method that compile the python modules
         :param ext_modules: set[Extension]: not required -> files that should be compiled
         :param cython_dir: str -> the C files output dir.
         :param compiler_directives: dict -> extra compiler option [like the lanugae]
@@ -187,8 +186,26 @@ class DjangoCompiler:
             ext_modules=cythonize(ext_modules, build_dir=cython_dir,
                                   compiler_directives=compiler_directives,
                                   ),
-
         )
+
+    def compile_project(self) -> None:
+        """
+        A method that compiles the django project
+        the method runs:
+            compile_modules()
+
+            copy_migrations_to_build()
+
+            initial_python_modules()
+
+            copy_needed_files()
+
+            copy_needed_dirs()
+
+        methods
+        :return: None
+        """
+        self.compile_modules()
         self.copy_migrations_to_build()
         self.initial_python_modules()
         self.copy_needed_files()
