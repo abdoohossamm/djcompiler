@@ -157,7 +157,7 @@ class DjangoCompiler:
             files = self.other_files_needed
         for file in files:
             try:
-                shutil.copy(file, f"./{self.build_directory}")
+                shutil.copy(file, f"./{self.build_directory}/{file}")
             except FileNotFoundError:
                 print(f"file {file} not found")
             except FileExistsError:
