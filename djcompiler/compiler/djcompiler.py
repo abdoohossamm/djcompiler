@@ -160,15 +160,24 @@ class DjangoCompiler:
         if files is None:
             files = self.other_files_needed
         for file in files:
-            callingPath = Path(os.getcwd())
-            filepath = str(callingPath) + '/' + file
+            calling_path = Path(os.getcwd())
+            filepath = str(Path.joinpath(calling_path, file))
             try:
-                shutil.copy(filepath, f"./{self.build_directory}/{file}")
+                destination = f"./{self.build_directory}/{file}"
+                # create the destination directory if it doesn't exist else shutil.copy() may raise FileNotFoundError
+                if not Path(destination).parent.exists():
+                    Path(destination).parent.mkdir(parents=True)
+
+                shutil.copy(filepath, destination)
+
             except FileNotFoundError:
-                print(f"file {file} not found")
+                print(f"file {filepath} not found")
                 continue
             except FileExistsError:
                 print(f"file {file} already copied")
+                continue
+            except Exception as e:
+                print(f"file {file} could NOT be copied: Exception: {e}")
                 continue
             print(f"needed file copied {file}")
 
