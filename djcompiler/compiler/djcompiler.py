@@ -8,6 +8,7 @@ from Cython.Distutils import build_ext
 import Cython
 from Cython.Build import cythonize
 import os
+from pathlib import Path
 import shutil
 from typing import List, Set
 
@@ -100,9 +101,12 @@ class DjangoCompiler:
                 new = path.split("./")[1]
                 self.migration_dirs.append(f"{new}")
             for name in files:
-                if self.check_ignored_files(name) and (name.endswith(".py") or name.endswith(".pyx")) \
+                filepath = str(Path.joinpath(Path(path), Path(name)))
+                filepath2 = './' + filepath  # alternate test in case of "./" leading
+                if ((self.check_ignored_files(filepath) and self.check_ignored_files(filepath2))
+                        and (name.endswith(".py") or name.endswith(".pyx")) \
                         and not name.startswith("__") \
-                        and not name[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                        and not name[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']):
                     file = os.path.join(path, name)
                     module_name = file.split("./")[1].split('.py')[0]
                     modules.add(Extension(module_name.replace("/", "."), [file]))
@@ -156,12 +160,26 @@ class DjangoCompiler:
         if files is None:
             files = self.other_files_needed
         for file in files:
+            calling_path = Path(os.getcwd())
+            filepath = str(Path.joinpath(calling_path, file))
             try:
-                shutil.copy(file, f"./{self.build_directory}/{file}")
+                destination = f"./{self.build_directory}/{file}"
+                # create the destination directory if it doesn't exist else shutil.copy() may raise FileNotFoundError
+                if not Path(destination).parent.exists():
+                    Path(destination).parent.mkdir(parents=True)
+
+                shutil.copy(filepath, destination)
+
             except FileNotFoundError:
-                print(f"file {file} not found")
+                print(f"file {filepath} not found")
+                continue
             except FileExistsError:
                 print(f"file {file} already copied")
+                continue
+            except Exception as e:
+                print(f"file {file} could NOT be copied: Exception: {e}")
+                continue
+            print(f"needed file copied {file}")
 
     def compile_modules(self, ext_modules: Set[Extension] = None,
                         cython_dir: str = "cython",
