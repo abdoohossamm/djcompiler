@@ -2,14 +2,15 @@
 A django Cython compiler that compiles django projects into C and outputs it to build folder.
 """
 import sys
-from distutils.core import setup
-from distutils.extension import Extension
+from setuptools import setup
+from setuptools import Extension
 from Cython.Distutils import build_ext
 import Cython
 from Cython.Build import cythonize
 import os
 import shutil
 from typing import List, Set
+from pathlib import Path
 
 
 class DjangoCompiler:
@@ -145,11 +146,24 @@ class DjangoCompiler:
 
     def initial_python_modules(self):
         print("#################### Initial Python Modules ####################")
-        for path, subdirs, files in os.walk(f"./{self.build_directory}"):
+
+        source_root = Path(".").resolve()
+        build_root = Path(self.build_directory).resolve()
+
+        for path, subdirs, files in os.walk(build_root):
             if self.python_modules_rules(path):
                 continue
-            f = open(f"{path}/__init__.py", "w")
-            f.close()
+
+            rel_path = Path(path).relative_to(build_root)
+            source_path = source_root / rel_path
+            src_init = source_path / "__init__.py"
+            dest_init = Path(path) / "__init__.py"
+
+            if src_init.exists():
+                shutil.copy2(src_init, dest_init)
+                print(f"Copied __init__.py from {src_init} → {dest_init}")
+            else:
+                print(f"No __init__.py in source for {rel_path}, skipping.")
 
     def copy_needed_files(self, files: list = None):
         print("#################### Copy needed files ####################")

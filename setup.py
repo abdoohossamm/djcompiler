@@ -24,7 +24,11 @@ if "install" in sys.argv:
             overlay_warning = True
             break
 
-setup()
+setup(install_requires=[
+    "setuptools>=54",
+    "cython>=0.29.33",
+    'wheel',
+])
 
 if overlay_warning:
     sys.stderr.write(
